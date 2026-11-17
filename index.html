@@ -1,0 +1,979 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Biology Showdown</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧫</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+  :root {
+    --bg: #10201c;
+    --bg-2: #0c1815;
+    --surface: #16302a;
+    --surface-2: #1c3b32;
+    --line: #2c5449;
+    --paper: #ece4d0;
+    --paper-2: #e0d6bc;
+    --ink: #17241d;
+    --ink-soft: #45564a;
+    --teal: #4fd1ae;
+    --teal-dim: #337a67;
+    --gold: #e8b34a;
+    --gold-dim: #a9812f;
+    --coral: #e0784f;
+    --coral-dim: #a4552f;
+    --violet: #a78bfa;
+    --violet-dim: #6b53a8;
+    --text-on-dark: #eaf3ee;
+    --text-on-dark-soft: #a9c2b7;
+    --shadow: rgba(4, 14, 11, 0.55);
+    --focus: #7fe8c8;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0b1613;
+      --surface: #12251f;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0b1613;
+    --surface: #12251f;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    background: radial-gradient(circle at 50% -10%, var(--surface-2) 0%, var(--bg) 55%, var(--bg-2) 100%);
+    color: var(--text-on-dark);
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    padding: clamp(16px, 3vw, 36px) 16px 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(18px, 3vw, 28px);
+  }
+
+  h1, h2, h3 { font-family: "Fraunces", ui-serif, Georgia, serif; text-wrap: balance; margin: 0; }
+
+  .wrap { width: 100%; max-width: 1180px; display: flex; flex-direction: column; gap: clamp(18px, 3vw, 28px); }
+
+  /* ---------- Header ---------- */
+  header.top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--line);
+  }
+  .titleblock .eyebrow {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin: 0 0 6px;
+  }
+  .titleblock h1 {
+    font-size: clamp(28px, 4.4vw, 44px);
+    font-weight: 700;
+    color: var(--text-on-dark);
+    line-height: 1.05;
+  }
+  .titleblock .sub {
+    margin-top: 6px;
+    color: var(--text-on-dark-soft);
+    font-size: 14px;
+  }
+
+  .top-actions { display: flex; gap: 10px; align-items: center; }
+
+  #reset-btn, #back-btn {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: transparent;
+    color: var(--text-on-dark-soft);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  #back-btn:hover { border-color: var(--teal); color: var(--teal); }
+  #reset-btn:hover { border-color: var(--coral); color: var(--coral); }
+  #reset-btn:focus-visible, #back-btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  #reset-btn.armed { border-color: var(--coral); color: var(--text-on-dark); background: var(--coral-dim); }
+
+  /* ---------- Hub ---------- */
+  .hub-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+  }
+  .hub-card {
+    background: linear-gradient(180deg, var(--surface-2), var(--surface));
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 22px 22px 20px;
+    text-align: left;
+    cursor: pointer;
+    color: inherit;
+    font: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .hub-card:hover { border-color: var(--gold-dim); transform: translateY(-2px); }
+  .hub-card:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .hub-card .hub-eyebrow {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--teal);
+  }
+  .hub-card h2 {
+    font-size: clamp(20px, 2.6vw, 25px);
+    color: var(--text-on-dark);
+    font-weight: 600;
+  }
+  .hub-card p {
+    color: var(--text-on-dark-soft);
+    font-size: 13.5px;
+    line-height: 1.5;
+    margin: 0;
+  }
+  .hub-card .hub-meta {
+    margin-top: 4px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  /* ---------- Scoreboard ---------- */
+  .scoreboard {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 760px) { .scoreboard { grid-template-columns: 1fr; } }
+
+  .team-card {
+    background: linear-gradient(180deg, var(--surface-2), var(--surface));
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .team-card.team-a { border-left: 3px solid var(--teal); }
+  .team-card.team-b { border-left: 3px solid var(--coral); }
+  .team-card.team-c { border-left: 3px solid var(--violet); }
+
+  .team-meta { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .team-name-input {
+    background: transparent;
+    border: none;
+    border-bottom: 1px dashed transparent;
+    color: var(--text-on-dark);
+    font-family: "IBM Plex Sans", sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    padding: 2px 0;
+    width: 100%;
+    max-width: 150px;
+  }
+  .team-name-input:hover, .team-name-input:focus { border-bottom-color: var(--line); }
+  .team-name-input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .team-label { font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-on-dark-soft); }
+
+  .team-score {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: clamp(26px, 4vw, 34px);
+    font-weight: 600;
+  }
+  .team-a .team-score { color: var(--teal); }
+  .team-b .team-score { color: var(--coral); }
+  .team-c .team-score { color: var(--violet); }
+
+  .score-nudge { display: flex; gap: 4px; }
+  .score-nudge button {
+    width: 26px; height: 26px;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--text-on-dark-soft);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 14px;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .score-nudge button:hover { color: var(--text-on-dark); border-color: var(--text-on-dark-soft); }
+  .score-nudge button:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+
+  /* ---------- Board ---------- */
+  .board {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+  }
+  @media (max-width: 760px) {
+    .board { grid-template-columns: repeat(2, 1fr); }
+    .cat-header { grid-column: span 1 !important; }
+  }
+
+  .cat-header {
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 8px;
+    text-align: center;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 11.5px;
+    letter-spacing: 0.04em;
+    line-height: 1.35;
+    color: var(--gold);
+    text-transform: uppercase;
+    min-height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .tile {
+    perspective: 800px;
+    height: 78px;
+  }
+  .tile-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.5s cubic-bezier(.4,.2,.2,1), opacity 0.4s;
+    transform-style: preserve-3d;
+  }
+  .tile.used .tile-inner { transform: rotateY(180deg); }
+
+  .tile-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--line);
+  }
+  .tile-front {
+    background: linear-gradient(160deg, var(--surface-2), var(--surface));
+    font-family: "Fraunces", serif;
+    font-weight: 600;
+    font-size: clamp(20px, 2.4vw, 26px);
+    color: var(--gold);
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .tile-front:hover { border-color: var(--gold-dim); transform: translateY(-1px); }
+  .tile-front:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .tile.used .tile-front { cursor: default; }
+
+  .tile-back {
+    background: var(--bg-2);
+    color: var(--teal-dim);
+    transform: rotateY(180deg);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  button.tile-front:disabled { cursor: default; }
+
+  /* ---------- Modal ---------- */
+  .modal-shroud {
+    position: fixed;
+    inset: 0;
+    background: rgba(6, 12, 10, 0.72);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 40;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+  }
+  .modal-shroud.open { opacity: 1; pointer-events: auto; }
+
+  .card {
+    perspective: 1600px;
+    width: min(760px, 100%);
+  }
+  .card-inner {
+    position: relative;
+    width: 100%;
+    min-height: 380px;
+    transform-style: preserve-3d;
+    transform: rotateY(90deg) scale(0.9);
+    transition: transform 0.5s cubic-bezier(.2,.6,.2,1);
+  }
+  .modal-shroud.open .card-inner { transform: rotateY(0deg) scale(1); }
+  .card-inner.flipped { transform: rotateY(180deg) scale(1) !important; }
+
+  .card-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    border-radius: 16px;
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow: 0 24px 60px var(--shadow), 0 2px 0 var(--paper-2) inset;
+    padding: clamp(22px, 4vw, 40px);
+    display: flex;
+    flex-direction: column;
+  }
+  .card-face.back { transform: rotateY(180deg); }
+
+  .card-kicker {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .card-kicker .pts { color: var(--coral-dim); font-weight: 600; }
+
+  .card-body {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    margin-top: 18px;
+  }
+  .card-question {
+    font-family: "Fraunces", serif;
+    font-weight: 500;
+    font-size: clamp(22px, 3.2vw, 30px);
+    line-height: 1.3;
+  }
+  .card-answer-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--teal-dim);
+    margin-bottom: 8px;
+  }
+  .card-answer {
+    font-family: "IBM Plex Sans", sans-serif;
+    font-weight: 500;
+    font-size: clamp(18px, 2.6vw, 23px);
+    line-height: 1.45;
+    color: var(--ink);
+  }
+
+  .card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 22px;
+  }
+  .btn {
+    font-family: "IBM Plex Sans", sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 8px;
+    padding: 10px 18px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: filter 0.15s, transform 0.1s;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn:focus-visible { outline: 2px solid var(--teal-dim); outline-offset: 2px; }
+  .btn-primary { background: var(--ink); color: var(--paper); }
+  .btn-primary:hover { filter: brightness(1.2); }
+  .btn-ghost { background: transparent; color: var(--ink-soft); border-color: var(--paper-2); }
+  .btn-ghost:hover { border-color: var(--ink-soft); color: var(--ink); }
+  .btn-award {
+    background: var(--surface-2);
+    color: var(--text-on-dark);
+  }
+  .btn-award.a { background: var(--teal-dim); }
+  .btn-award.b { background: var(--coral-dim); }
+  .btn-award.c { background: var(--violet-dim); }
+  .btn-award:hover { filter: brightness(1.15); }
+
+  .card-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid var(--paper-2);
+    background: transparent;
+    color: var(--ink-soft);
+    font-size: 16px;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .card-close:hover { background: var(--paper-2); color: var(--ink); }
+  .card-close:focus-visible { outline: 2px solid var(--teal-dim); outline-offset: 2px; }
+
+  footer.foot {
+    text-align: center;
+    color: var(--text-on-dark-soft);
+    font-size: 11.5px;
+    line-height: 1.6;
+    max-width: 760px;
+    padding-top: 6px;
+  }
+
+  [hidden] { display: none !important; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tile-inner, .card-inner, .modal-shroud, .tile-front { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- ===================== HUB VIEW ===================== -->
+  <section id="hub-view">
+    <header class="top">
+      <div class="titleblock">
+        <p class="eyebrow">Biology · Review Games</p>
+        <h1>Showdown</h1>
+        <p class="sub">Pick a unit to review.</p>
+      </div>
+    </header>
+    <div class="hub-grid" id="hub-grid"></div>
+  </section>
+
+  <!-- ===================== GAME VIEW ===================== -->
+  <section id="game-view" hidden>
+    <header class="top">
+      <div class="titleblock">
+        <p class="eyebrow" id="g-eyebrow"></p>
+        <h1 id="g-title"></h1>
+        <p class="sub" id="g-sub"></p>
+      </div>
+      <div class="top-actions">
+        <button id="back-btn" type="button">&larr; All Games</button>
+        <button id="reset-btn" type="button">Reset Board</button>
+      </div>
+    </header>
+
+    <section class="scoreboard" aria-label="Team scores">
+      <div class="team-card team-a">
+        <div class="team-meta">
+          <span class="team-label">Team A</span>
+          <input class="team-name-input" id="team-a-name" maxlength="24" aria-label="Team A name">
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div class="score-nudge">
+            <button type="button" data-team="a" data-delta="-100" aria-label="Subtract 100 from Team A">&minus;</button>
+            <button type="button" data-team="a" data-delta="100" aria-label="Add 100 to Team A">+</button>
+          </div>
+          <span class="team-score" id="team-a-score">0</span>
+        </div>
+      </div>
+      <div class="team-card team-b">
+        <div class="team-meta">
+          <span class="team-label">Team B</span>
+          <input class="team-name-input" id="team-b-name" maxlength="24" aria-label="Team B name">
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div class="score-nudge">
+            <button type="button" data-team="b" data-delta="-100" aria-label="Subtract 100 from Team B">&minus;</button>
+            <button type="button" data-team="b" data-delta="100" aria-label="Add 100 to Team B">+</button>
+          </div>
+          <span class="team-score" id="team-b-score">0</span>
+        </div>
+      </div>
+      <div class="team-card team-c">
+        <div class="team-meta">
+          <span class="team-label">Team C</span>
+          <input class="team-name-input" id="team-c-name" maxlength="24" aria-label="Team C name">
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div class="score-nudge">
+            <button type="button" data-team="c" data-delta="-100" aria-label="Subtract 100 from Team C">&minus;</button>
+            <button type="button" data-team="c" data-delta="100" aria-label="Add 100 to Team C">+</button>
+          </div>
+          <span class="team-score" id="team-c-score">0</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="board" id="board" aria-label="Game board"></section>
+
+    <footer class="foot" id="g-footer"></footer>
+  </section>
+
+</div>
+
+<div class="modal-shroud" id="modal">
+  <div class="card">
+    <div class="card-inner" id="card-inner">
+      <div class="card-face front">
+        <button class="card-close" id="close-q" type="button" aria-label="Close">&#10005;</button>
+        <div class="card-kicker">
+          <span id="q-cat"></span>
+          <span class="pts" id="q-pts"></span>
+        </div>
+        <div class="card-body">
+          <p class="card-question" id="q-text"></p>
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-primary" id="reveal-btn" type="button">Reveal Answer</button>
+        </div>
+      </div>
+      <div class="card-face back">
+        <button class="card-close" id="close-a" type="button" aria-label="Close">&#10005;</button>
+        <div class="card-kicker">
+          <span id="a-cat"></span>
+          <span class="pts" id="a-pts"></span>
+        </div>
+        <div class="card-body">
+          <div>
+            <p class="card-answer-label">Answer</p>
+            <p class="card-answer" id="a-text"></p>
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-award a" id="award-a" type="button">Award to Team A</button>
+          <button class="btn btn-award b" id="award-b" type="button">Award to Team B</button>
+          <button class="btn btn-award c" id="award-c" type="button">Award to Team C</button>
+          <button class="btn btn-ghost" id="skip-btn" type="button">No Points / Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var GAMES = {
+    homeostasis: {
+      id: "homeostasis",
+      eyebrow: "Biology · Homeostasis Unit",
+      title: "Homeostasis Showdown",
+      sub: "Test 1 review — pick a category and a point value.",
+      hubDesc: "Respiratory, circulatory, digestive, macromolecules, and homeostasis — the full Test 1 unit.",
+      hubMeta: "5 categories · 25 clues",
+      teamDefaults: { a: "Red Blood Cells", b: "Mighty Mitochondria", c: "White Blood Cells" },
+      footer: "AI Disclosure: This review game was developed with the assistance of Claude (Anthropic), an AI assistant, covering the content of Test 1 (Homeostasis unit). The instructor reviewed and finalized the material before classroom use.",
+      categories: [
+        {
+          name: "Respiratory & Circulatory",
+          clues: [
+            { pts: 100, q: "The respiratory system takes in this gas and removes carbon dioxide from the body.", a: "Oxygen (O2)" },
+            { pts: 200, q: "This is the smallest type of blood vessel — where oxygen, nutrients, and wastes are exchanged with the body's cells.", a: "Capillaries" },
+            { pts: 300, q: "Pulmonary veins carry this type of blood, moving in this direction.", a: "Oxygen-RICH blood, moving from the lungs to the heart" },
+            { pts: 400, q: "Give one way the circulatory and respiratory systems work together to help the body maintain homeostasis.", a: "Example: red blood cells pick up oxygen from the lungs and carry it to the body's cells (or: the diaphragm and rib cage move air in and out while the blood carries it the rest of the way)" },
+            { pts: 500, q: "Why is it helpful that blood moves through capillaries more slowly than anywhere else in the body?", a: "It gives more time for oxygen, nutrients, and wastes to be exchanged between the blood and the body's cells" }
+          ]
+        },
+        {
+          name: "Digestive System",
+          clues: [
+            { pts: 100, q: "This substance is released by the liver to help digest fats.", a: "Bile" },
+            { pts: 200, q: "This enzyme, found in saliva, begins the chemical digestion of carbohydrates in the mouth.", a: "Amylase" },
+            { pts: 300, q: "These tiny, finger-like projections in the small intestine increase surface area for absorbing nutrients.", a: "Villi (singular: villus)" },
+            { pts: 400, q: "Why does pepsin only work in a low-pH (acidic) environment?", a: "Its shape only works correctly at a low pH, matching the stomach's acidic environment — this keeps it from digesting tissue elsewhere in the body, where pH is different" },
+            { pts: 500, q: "You eat a hamburger. Where does MECHANICAL digestion of the meat begin, and where does CHEMICAL digestion of that protein begin?", a: "Mechanical digestion begins in the mouth (chewing); chemical digestion of the protein begins in the stomach (pepsin)" }
+          ]
+        },
+        {
+          name: "Macromolecules",
+          clues: [
+            { pts: 100, q: "This is the monomer (building block) of a carbohydrate.", a: "A simple sugar (monosaccharide)" },
+            { pts: 200, q: "Of these — protein, lipid, nucleic acid, sodium chloride — which one is NOT an organic molecule?", a: "Sodium chloride (table salt) — it's inorganic" },
+            { pts: 300, q: "Classify this as Carbohydrate, Lipid, or Protein: waterproof membranes and coverings.", a: "Lipid" },
+            { pts: 400, q: "Classify this as Carbohydrate, Lipid, or Protein: a polypeptide.", a: "Protein" },
+            { pts: 500, q: "Which macromolecule is used for long-term energy storage in the body?", a: "Lipid (fat)" }
+          ]
+        },
+        {
+          name: "Homeostasis & Life",
+          clues: [
+            { pts: 100, q: "Name 3 of the 8 signs that something is alive.", a: "Any 3 of: made of cells, reproduces, grows/develops, uses energy, responds to its environment, maintains homeostasis, is organized, adapts/evolves over time" },
+            { pts: 200, q: "What is homeostasis? Give one example from the human body.", a: "Maintaining a stable internal environment — example: regulating body temperature, blood sugar, or blood pH" },
+            { pts: 300, q: "What organ produces insulin, and what does insulin help control?", a: "The pancreas; it helps control blood glucose (blood sugar) levels" },
+            { pts: 400, q: "After running 5 miles, what would you expect to happen to insulin levels — and why?", a: "They'd stay near baseline (not spike) — insulin rises mainly when blood glucose RISES, like after eating, not during exercise" },
+            { pts: 500, q: "Why does the body work to keep something like blood-glucose level stable, instead of letting it swing widely?", a: "Cells need a steady, reliable supply of glucose for energy — big swings can damage tissues/organs and disrupt normal cell function" }
+          ]
+        },
+        {
+          name: "Know the Structures",
+          clues: [
+            { pts: 100, q: "This tube-shaped structure connects the throat to the lungs and branches into the bronchi.", a: "Trachea" },
+            { pts: 200, q: "These tiny air sacs in the lungs are where gas exchange with capillaries actually happens.", a: "Alveoli" },
+            { pts: 300, q: "This type of blood vessel carries blood back TOWARD the heart.", a: "Veins" },
+            { pts: 400, q: "This heart chamber receives oxygen-rich blood coming in from the lungs.", a: "Left atrium" },
+            { pts: 500, q: "These two organs work closely with the small intestine — one stores bile, the other makes enzymes and controls blood sugar.", a: "Gallbladder (stores bile) and pancreas (enzymes + blood sugar control)" }
+          ]
+        }
+      ]
+    },
+
+    cells: {
+      id: "cells",
+      eyebrow: "Biology · Unit 2 — Cells",
+      title: "Cell Structures Showdown",
+      sub: "Unit 2 review — pick a category and a point value.",
+      hubDesc: "Macromolecules, cell structure & membrane, cell transport, energy, and cellular respiration.",
+      hubMeta: "5 categories · 25 clues",
+      teamDefaults: { a: "The Mitochondria", b: "Golgi Squad", c: "Ribosome Rangers" },
+      footer: "AI Disclosure: This review game was developed with the assistance of Claude (Anthropic), an AI assistant, covering the content of the Unit 2 Cells test. The instructor reviewed and finalized the material before classroom use.",
+      categories: [
+        {
+          name: "Macromolecules",
+          clues: [
+            { pts: 100, q: "This is the monomer (building block) of a lipid.", a: "A fatty acid" },
+            { pts: 200, q: "This is the monomer (building block) of a carbohydrate.", a: "A simple sugar (monosaccharide)" },
+            { pts: 300, q: "DNA and RNA belong to this class of macromolecule.", a: "Nucleic acids" },
+            { pts: 400, q: "This macromolecule class includes enzymes and is built from amino acids.", a: "Proteins" },
+            { pts: 500, q: "Of these — protein, lipid, nucleic acid, sodium chloride — which one is NOT an organic molecule, and why?", a: "Sodium chloride (table salt) — it's inorganic, not built around carbon the way the others are" }
+          ]
+        },
+        {
+          name: "Cell Structure & Membrane",
+          clues: [
+            { pts: 100, q: "This organelle stores a eukaryotic cell's DNA.", a: "The nucleus" },
+            { pts: 200, q: "This is the main type of molecule that makes up the cell membrane.", a: "Phospholipid" },
+            { pts: 300, q: "This membrane molecule helps stabilize the membrane and makes it more resistant to temperature changes.", a: "Cholesterol" },
+            { pts: 400, q: "On a phospholipid, name the part that is hydrophilic (attracted to water) and the part that is hydrophobic (repelled by water).", a: "The head is hydrophilic (polar); the two tails are hydrophobic (non-polar)" },
+            { pts: 500, q: "Carbohydrate 'tags' attached to proteins and lipids in the cell membrane are found on this side of the membrane.", a: "The outside (exterior) of the membrane" }
+          ]
+        },
+        {
+          name: "Cell Transport",
+          clues: [
+            { pts: 100, q: "This is the movement of molecules from an area of high concentration to low concentration, and it requires no energy.", a: "Diffusion" },
+            { pts: 200, q: "This is the diffusion of water specifically, across a selectively permeable membrane.", a: "Osmosis" },
+            { pts: 300, q: "A membrane that lets some things cross but not others is described using this term.", a: "Selectively permeable (semipermeable)" },
+            { pts: 400, q: "This type of transport requires the cell to use energy and proteins to move molecules AGAINST their concentration gradient (low to high).", a: "Active transport" },
+            { pts: 500, q: "A cell is placed in a solution that has MORE solute (is more concentrated) than the inside of the cell. Is that solution hypertonic, hypotonic, or isotonic to the cell — and which way will water move?", a: "Hypertonic to the cell; water moves OUT of the cell and into the solution" }
+          ]
+        },
+        {
+          name: "Energy & ATP",
+          clues: [
+            { pts: 100, q: "ATP stands for this three-part name.", a: "Adenosine triphosphate" },
+            { pts: 200, q: "This is the main energy-carrying molecule that cells use directly to power cellular work.", a: "ATP (adenosine triphosphate)" },
+            { pts: 300, q: "When ATP loses one phosphate group and releases energy, it becomes this molecule.", a: "ADP (adenosine diphosphate)" },
+            { pts: 400, q: "This is the first stage of cellular respiration. It happens in the cytoplasm and does not require oxygen.", a: "Glycolysis" },
+            { pts: 500, q: "Glycolysis breaks down one glucose molecule. How many ATP does it produce in TOTAL, and how many NET ATP does the cell actually gain after paying the 2 ATP it costs to get started?", a: "Total: 4 ATP produced. Net: 2 ATP gained (4 produced minus the 2 invested to start the process). Know both numbers — different versions of the test ask for either one." }
+          ]
+        },
+        {
+          name: "Respiration & Fermentation",
+          clues: [
+            { pts: 100, q: "Along with oxygen, this is the other reactant (fuel) that cellular respiration uses.", a: "Glucose (sugar)" },
+            { pts: 200, q: "This is the product humans make when fermentation happens because oxygen isn't available.", a: "Lactic acid" },
+            { pts: 300, q: "This stage of cellular respiration takes place inside the mitochondria and produces carbon dioxide.", a: "The Krebs cycle (citric acid cycle)" },
+            { pts: 400, q: "This structure in the mitochondria uses the movement of hydrogen ions (H+) to produce most of the cell's ATP.", a: "The electron transport chain (ETC)" },
+            { pts: 500, q: "The Calvin cycle is a stage of this process — NOT cellular respiration. Name the process it actually belongs to.", a: "Photosynthesis" }
+          ]
+        }
+      ]
+    }
+  };
+
+  var GAME_ORDER = ["homeostasis", "cells"];
+
+  var state = null;
+  var currentGameId = null;
+  var currentCategories = null;
+
+  var hubView = document.getElementById("hub-view");
+  var gameView = document.getElementById("game-view");
+  var hubGrid = document.getElementById("hub-grid");
+  var boardEl = document.getElementById("board");
+  var modal = document.getElementById("modal");
+  var cardInner = document.getElementById("card-inner");
+  var currentClue = null;
+
+  function stateKey(gameId) { return "showdown-state-" + gameId; }
+
+  function defaultState(game) {
+    return {
+      used: {},
+      scores: { a: 0, b: 0, c: 0 },
+      names: { a: game.teamDefaults.a, b: game.teamDefaults.b, c: game.teamDefaults.c }
+    };
+  }
+
+  function loadState(game) {
+    var fresh = defaultState(game);
+    try {
+      var raw = localStorage.getItem(stateKey(game.id));
+      if (!raw) return fresh;
+      var saved = JSON.parse(raw);
+      if (saved && typeof saved === "object") {
+        fresh.used = saved.used || {};
+        fresh.scores = saved.scores || fresh.scores;
+        if (typeof fresh.scores.a !== "number") fresh.scores.a = 0;
+        if (typeof fresh.scores.b !== "number") fresh.scores.b = 0;
+        if (typeof fresh.scores.c !== "number") fresh.scores.c = 0;
+        fresh.names = saved.names || fresh.names;
+        if (!fresh.names.a) fresh.names.a = game.teamDefaults.a;
+        if (!fresh.names.b) fresh.names.b = game.teamDefaults.b;
+        if (!fresh.names.c) fresh.names.c = game.teamDefaults.c;
+      }
+    } catch (e) { /* ignore - start fresh */ }
+    return fresh;
+  }
+
+  function saveState() {
+    if (!currentGameId) return;
+    try {
+      localStorage.setItem(stateKey(currentGameId), JSON.stringify(state));
+    } catch (e) { /* ignore - per-viewer convenience only */ }
+  }
+
+  function tileKey(ci, vi) { return ci + "-" + vi; }
+
+  function renderBoard() {
+    boardEl.innerHTML = "";
+    currentCategories.forEach(function (cat) {
+      var head = document.createElement("div");
+      head.className = "cat-header";
+      head.textContent = cat.name;
+      boardEl.appendChild(head);
+    });
+    var maxRows = 5;
+    for (let vi = 0; vi < maxRows; vi++) {
+      currentCategories.forEach(function (cat, ci) {
+        var clue = cat.clues[vi];
+        var key = tileKey(ci, vi);
+        var tile = document.createElement("div");
+        tile.className = "tile" + (state.used[key] ? " used" : "");
+        tile.innerHTML =
+          '<div class="tile-inner">' +
+            '<button type="button" class="tile-face tile-front" ' + (state.used[key] ? "disabled" : "") + '>' + clue.pts + '</button>' +
+            '<div class="tile-face tile-back">Answered</div>' +
+          '</div>';
+        var btn = tile.querySelector(".tile-front");
+        btn.addEventListener("click", function () { openClue(ci, vi); });
+        boardEl.appendChild(tile);
+      });
+    }
+  }
+
+  function openClue(ci, vi) {
+    var cat = currentCategories[ci];
+    var clue = cat.clues[vi];
+    currentClue = { ci: ci, vi: vi, cat: cat.name, clue: clue };
+
+    document.getElementById("q-cat").textContent = cat.name;
+    document.getElementById("q-pts").textContent = clue.pts + " pts";
+    document.getElementById("q-text").textContent = clue.q;
+    document.getElementById("a-cat").textContent = cat.name;
+    document.getElementById("a-pts").textContent = clue.pts + " pts";
+    document.getElementById("a-text").textContent = clue.a;
+
+    cardInner.classList.remove("flipped");
+    modal.classList.add("open");
+    document.getElementById("reveal-btn").focus();
+  }
+
+  function closeModal(markUsed) {
+    modal.classList.remove("open");
+    if (markUsed && currentClue) {
+      var key = tileKey(currentClue.ci, currentClue.vi);
+      state.used[key] = true;
+      saveState();
+      renderBoard();
+    }
+    currentClue = null;
+  }
+
+  function awardPoints(team) {
+    if (!currentClue) return;
+    state.scores[team] += currentClue.clue.pts;
+    updateScoreDisplay();
+    saveState();
+    closeModal(true);
+  }
+
+  function updateScoreDisplay() {
+    document.getElementById("team-a-score").textContent = state.scores.a;
+    document.getElementById("team-b-score").textContent = state.scores.b;
+    document.getElementById("team-c-score").textContent = state.scores.c;
+  }
+
+  document.getElementById("reveal-btn").addEventListener("click", function () {
+    cardInner.classList.add("flipped");
+    setTimeout(function () {
+      var b = document.getElementById("award-a");
+      if (b) b.focus();
+    }, 260);
+  });
+  document.getElementById("close-q").addEventListener("click", function () { closeModal(false); });
+  document.getElementById("close-a").addEventListener("click", function () { closeModal(true); });
+  document.getElementById("skip-btn").addEventListener("click", function () { closeModal(true); });
+  document.getElementById("award-a").addEventListener("click", function () { awardPoints("a"); });
+  document.getElementById("award-b").addEventListener("click", function () { awardPoints("b"); });
+  document.getElementById("award-c").addEventListener("click", function () { awardPoints("c"); });
+  modal.addEventListener("click", function (e) { if (e.target === modal) closeModal(false); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && modal.classList.contains("open")) closeModal(false);
+  });
+
+  document.querySelectorAll(".score-nudge button").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var team = btn.getAttribute("data-team");
+      var delta = parseInt(btn.getAttribute("data-delta"), 10);
+      state.scores[team] = Math.max(0, state.scores[team] + delta);
+      updateScoreDisplay();
+      saveState();
+    });
+  });
+
+  document.getElementById("team-a-name").addEventListener("input", function (e) {
+    state.names.a = e.target.value; saveState();
+  });
+  document.getElementById("team-b-name").addEventListener("input", function (e) {
+    state.names.b = e.target.value; saveState();
+  });
+  document.getElementById("team-c-name").addEventListener("input", function (e) {
+    state.names.c = e.target.value; saveState();
+  });
+
+  var resetBtn = document.getElementById("reset-btn");
+  var resetArmed = false;
+  var resetTimer = null;
+  resetBtn.addEventListener("click", function () {
+    if (!resetArmed) {
+      resetArmed = true;
+      resetBtn.textContent = "Confirm Reset?";
+      resetBtn.classList.add("armed");
+      resetTimer = setTimeout(function () {
+        resetArmed = false;
+        resetBtn.textContent = "Reset Board";
+        resetBtn.classList.remove("armed");
+      }, 3500);
+      return;
+    }
+    clearTimeout(resetTimer);
+    resetArmed = false;
+    resetBtn.textContent = "Reset Board";
+    resetBtn.classList.remove("armed");
+    var game = GAMES[currentGameId];
+    state = defaultState(game);
+    saveState();
+    document.getElementById("team-a-name").value = state.names.a;
+    document.getElementById("team-b-name").value = state.names.b;
+    document.getElementById("team-c-name").value = state.names.c;
+    updateScoreDisplay();
+    renderBoard();
+  });
+
+  function renderHub() {
+    hubGrid.innerHTML = "";
+    GAME_ORDER.forEach(function (id) {
+      var game = GAMES[id];
+      var card = document.createElement("button");
+      card.type = "button";
+      card.className = "hub-card";
+      card.innerHTML =
+        '<span class="hub-eyebrow">' + game.eyebrow + '</span>' +
+        '<h2>' + game.title + '</h2>' +
+        '<p>' + game.hubDesc + '</p>' +
+        '<span class="hub-meta">' + game.hubMeta + '</span>';
+      card.addEventListener("click", function () { openGame(id); });
+      hubGrid.appendChild(card);
+    });
+  }
+
+  function openGame(id) {
+    var game = GAMES[id];
+    if (!game) return;
+    currentGameId = id;
+    currentCategories = game.categories;
+    state = loadState(game);
+
+    document.getElementById("g-eyebrow").textContent = game.eyebrow;
+    document.getElementById("g-title").textContent = game.title;
+    document.getElementById("g-sub").textContent = game.sub;
+    document.getElementById("g-footer").textContent = game.footer;
+    document.getElementById("team-a-name").value = state.names.a;
+    document.getElementById("team-b-name").value = state.names.b;
+    document.getElementById("team-c-name").value = state.names.c;
+
+    resetArmed = false;
+    resetBtn.textContent = "Reset Board";
+    resetBtn.classList.remove("armed");
+
+    updateScoreDisplay();
+    renderBoard();
+
+    hubView.hidden = true;
+    gameView.hidden = false;
+    window.scrollTo(0, 0);
+    if (history.pushState) {
+      try { history.pushState({ showdownGame: id }, "", "#" + id); } catch (e) { /* ignore */ }
+    }
+  }
+
+  function backToHub(skipHistory) {
+    currentGameId = null;
+    currentCategories = null;
+    state = null;
+    gameView.hidden = true;
+    hubView.hidden = false;
+    window.scrollTo(0, 0);
+    if (!skipHistory && history.pushState) {
+      try { history.pushState({ showdownGame: null }, "", location.pathname + location.search); } catch (e) { /* ignore */ }
+    }
+  }
+
+  document.getElementById("back-btn").addEventListener("click", function () { backToHub(false); });
+
+  window.addEventListener("popstate", function (e) {
+    var id = e.state && e.state.showdownGame;
+    if (id && GAMES[id]) {
+      openGame(id);
+    } else {
+      backToHub(true);
+    }
+  });
+
+  function boot() {
+    renderHub();
+    var hash = (location.hash || "").replace("#", "");
+    if (hash && GAMES[hash]) {
+      openGame(hash);
+    }
+  }
+
+  boot();
+})();
+</script>
+
+</body>
+</html>
